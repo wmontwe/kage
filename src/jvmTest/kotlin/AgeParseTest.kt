@@ -5,7 +5,9 @@
  */
 package kage
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isInstanceOf
 import java.io.BufferedReader
 import java.io.StringReader
 import kage.crypto.mlkem.MlKem768X25519Identity
@@ -71,8 +73,8 @@ class AgeParseTest {
     val identities = Age.parseIdentities(reader(file))
 
     assertThat(identities).hasSize(2)
-    assertThat(identities[0]).isInstanceOf(X25519Identity::class.java)
-    assertThat(identities[1]).isInstanceOf(MlKem768X25519Identity::class.java)
+    assertThat(identities[0]).isInstanceOf<X25519Identity>()
+    assertThat(identities[1]).isInstanceOf<MlKem768X25519Identity>()
   }
 
   @Test
@@ -93,8 +95,8 @@ class AgeParseTest {
     val recipients = Age.parseRecipients(reader(file))
 
     assertThat(recipients).hasSize(2)
-    assertThat(recipients[0]).isInstanceOf(X25519Recipient::class.java)
-    assertThat(recipients[1]).isInstanceOf(MlKem768X25519Recipient::class.java)
+    assertThat(recipients[0]).isInstanceOf<X25519Recipient>()
+    assertThat(recipients[1]).isInstanceOf<MlKem768X25519Recipient>()
   }
 
   @Test

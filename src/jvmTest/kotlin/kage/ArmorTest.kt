@@ -5,7 +5,9 @@
  */
 package kage.kage
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.message
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import kage.Age
@@ -67,7 +69,7 @@ class ArmorTest {
         Age.decryptStream(listOf(identity), encryptedInput, decryptedOutput)
       }
 
-    assertThat(error).hasMessageThat().isEqualTo("trailing data after armored file")
+    assertThat(error).message().isEqualTo("trailing data after armored file")
   }
 
   @Test
@@ -94,7 +96,7 @@ class ArmorTest {
         Age.decryptStream(listOf(identity), encryptedInput, decryptedOutput)
       }
 
-    assertThat(error).hasMessageThat().isEqualTo("too much trailing whitespace")
+    assertThat(error).message().isEqualTo("too much trailing whitespace")
   }
 
   @Test
@@ -121,7 +123,7 @@ class ArmorTest {
       }
 
     assertThat(error)
-      .hasMessageThat()
+      .message()
       .isEqualTo("invalid first line: -----BEGIN AGE ENCRYPTED FILE-----something else")
   }
 
@@ -147,7 +149,7 @@ class ArmorTest {
         Age.decryptStream(listOf(identity), encryptedInput, decryptedOutput)
       }
 
-    assertThat(error).hasMessageThat().isEqualTo("column limit exceeded")
+    assertThat(error).message().isEqualTo("column limit exceeded")
   }
 
   @Test
@@ -173,7 +175,7 @@ class ArmorTest {
         Age.decryptStream(listOf(identity), encryptedInput, decryptedOutput)
       }
 
-    assertThat(error).hasMessageThat().isEqualTo("invalid closing line")
+    assertThat(error).message().isEqualTo("invalid closing line")
   }
 
   @Test

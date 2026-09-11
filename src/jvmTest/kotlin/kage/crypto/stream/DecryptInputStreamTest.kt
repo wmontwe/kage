@@ -5,7 +5,8 @@
  */
 package kage.crypto.stream
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -49,6 +50,6 @@ class DecryptInputStreamTest {
     val input = ShortReadInputStream(ByteArrayInputStream(ciphertext.toByteArray()))
     val decrypted = DecryptInputStream(key, input).readAllBytes()
 
-    assertThat(decrypted).asList().containsExactlyElementsIn(payload.asList())
+    assertThat(decrypted).isEqualTo(payload)
   }
 }

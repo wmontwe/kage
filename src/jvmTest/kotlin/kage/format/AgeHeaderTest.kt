@@ -5,7 +5,10 @@
  */
 package kage.format
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.startsWith
 import java.io.ByteArrayOutputStream
 import java.util.Base64
 import kage.errors.InvalidFooterException
@@ -34,7 +37,7 @@ class AgeHeaderTest {
     val actualMac = Base64.getDecoder().decode("gxhoSa5BciRDt8lOpYNcx4EYtKpS0CJ06F3ZwN82VaM")
 
     assertThat(header.recipients).hasSize(2)
-    assertThat(header.mac).asList().containsExactlyElementsIn(actualMac.asList())
+    assertThat(header.mac).isEqualTo(actualMac)
   }
 
   @Test
@@ -54,7 +57,7 @@ class AgeHeaderTest {
     val mac = AgeHeader.parseFooter(reader)
     val actualMac = Base64.getDecoder().decode("gxhoSa5BciRDt8lOpYNcx4EYtKpS0CJ06F3ZwN82VaM")
 
-    assertThat(mac).asList().containsExactlyElementsIn(actualMac.asList())
+    assertThat(mac).isEqualTo(actualMac)
   }
 
   @Test

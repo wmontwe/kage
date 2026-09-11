@@ -5,7 +5,10 @@
  */
 package kage.utils
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import kage.errors.InvalidBase64StringException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow

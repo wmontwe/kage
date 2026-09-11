@@ -5,7 +5,12 @@
  */
 package kage
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.message
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -66,7 +71,7 @@ class ShortReadStreamTest {
     val actualMac = Base64.getDecoder().decode("gxhoSa5BciRDt8lOpYNcx4EYtKpS0CJ06F3ZwN82VaM")
 
     assertThat(header.recipients).hasSize(2)
-    assertThat(header.mac).asList().containsExactlyElementsIn(actualMac.asList())
+    assertThat(header.mac).isEqualTo(actualMac)
   }
 
   @Test
@@ -112,7 +117,7 @@ class ShortReadStreamTest {
     reader.readLine()
 
     val err = assertThrows<InvalidRecipientException> { AgeStanza.parseBodyLines(reader) }
-    assertThat(err).hasMessageThat().contains("Encountered the footer")
+    assertThat(err).message().isNotNull().contains("Encountered the footer")
   }
 
   @Test

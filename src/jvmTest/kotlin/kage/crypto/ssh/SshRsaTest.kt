@@ -5,7 +5,9 @@
  */
 package kage.kage.crypto.ssh
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
 import java.io.ByteArrayInputStream
 import java.util.Random
 import kage.Age
@@ -76,7 +78,7 @@ class SshRsaTest {
 
     val identity = SshKey.parseIdentity(privateKey)
     val unwrapped = identity.unwrap(listOf(stanza))
-    assertThat(unwrapped.asList()).containsExactlyElementsIn(fileKey.asList())
+    assertThat(unwrapped).isEqualTo(fileKey)
   }
 
   @Test
@@ -88,7 +90,7 @@ class SshRsaTest {
     Random().nextBytes(fileKey)
 
     val stanzas = recipient.wrap(fileKey)
-    assertThat(identity.unwrap(stanzas).asList()).containsExactlyElementsIn(fileKey.asList())
+    assertThat(identity.unwrap(stanzas)).isEqualTo(fileKey)
   }
 
   @Test

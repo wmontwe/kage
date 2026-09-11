@@ -5,7 +5,9 @@
  */
 package kage.kage.crypto.x25519
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
 import java.security.SecureRandom
 import java.util.Random
 import kage.Age
@@ -35,14 +37,14 @@ class X25519RecipientTest {
 
     val sharedSecret = stanza.args.first().decodeBase64()
 
-    assertThat(sharedSecret).hasLength(X25519Recipient.EPHEMERAL_SECRET_LEN)
+    assertThat(sharedSecret).hasSize(X25519Recipient.EPHEMERAL_SECRET_LEN)
     assertThat(stanza.type).isEqualTo(X25519Recipient.X25519_STANZA_TYPE)
 
     val identity = X25519Identity(privateKey, publicKey)
 
     val unwrapped = identity.unwrap(listOf(stanza))
 
-    assertThat(fileKey).asList().containsExactlyElementsIn(unwrapped.asList())
+    assertThat(fileKey).isEqualTo(unwrapped)
   }
 
   @Test

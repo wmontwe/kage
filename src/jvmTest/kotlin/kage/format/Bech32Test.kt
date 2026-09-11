@@ -5,9 +5,11 @@
  */
 package kage.kage.format
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import com.github.michaelbull.result.getOrThrow
 import com.github.michaelbull.result.unwrapError
-import com.google.common.truth.Truth.assertThat
 import kage.errors.Bech32Exception
 import kage.format.Bech32
 import org.bouncycastle.util.encoders.Hex
@@ -97,7 +99,7 @@ class Bech32Test {
 
       if (!test.valid) {
         val err = Bech32.decode(str)
-        assertThat(err.unwrapError()).isInstanceOf(Bech32Exception::class.java)
+        assertThat(err.unwrapError()).isInstanceOf<Bech32Exception>()
 
         continue
       }
@@ -119,7 +121,7 @@ class Bech32Test {
 
       val res = Bech32.decode(flipped)
 
-      assertThat(res.unwrapError()).isInstanceOf(Bech32Exception::class.java)
+      assertThat(res.unwrapError()).isInstanceOf<Bech32Exception>()
     }
   }
 }

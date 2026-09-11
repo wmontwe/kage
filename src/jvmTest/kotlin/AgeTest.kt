@@ -5,7 +5,9 @@
  */
 package kage
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -115,7 +117,7 @@ class AgeTest {
 
     Age.decryptStream(listOf(identity), encryptedInput, decryptedOutput)
 
-    assertThat(decryptedOutput.toByteArray()).asList().containsExactlyElementsIn(i.asList())
+    assertThat(decryptedOutput.toByteArray()).isEqualTo(i)
   }
 
   @Test
@@ -136,7 +138,7 @@ class AgeTest {
 
     Age.decryptStream(listOf(identity), encryptedInput, decryptedOutput)
 
-    assertThat(decryptedOutput.toByteArray()).asList().containsExactlyElementsIn(i.asList())
+    assertThat(decryptedOutput.toByteArray()).isEqualTo(i)
   }
 
   @Test
@@ -160,7 +162,7 @@ class AgeTest {
 
     val out = Age.decrypt(identity, ageFile)
 
-    assertThat(out.readAllBytes()).hasLength(0)
+    assertThat(out.readAllBytes()).hasSize(0)
   }
 
   @Test
@@ -175,10 +177,10 @@ class AgeTest {
     val ageFile = Age.encrypt(listOf(otherRecipient, recipient), bais)
 
     val out = Age.decrypt(identity, ageFile)
-    assertThat(out.readAllBytes()).asList().containsExactlyElementsIn(payload.asList())
+    assertThat(out.readAllBytes()).isEqualTo(payload)
 
     val otherOut = Age.decrypt(otherIdentity, ageFile)
-    assertThat(otherOut.readAllBytes()).asList().containsExactlyElementsIn(payload.asList())
+    assertThat(otherOut.readAllBytes()).isEqualTo(payload)
   }
 
   @Test
@@ -193,7 +195,7 @@ class AgeTest {
     val ageFile = Age.encrypt(listOf(recipient), bais)
 
     val out = Age.decrypt(listOf(otherIdentity, identity), ageFile)
-    assertThat(out.readAllBytes()).asList().containsExactlyElementsIn(payload.asList())
+    assertThat(out.readAllBytes()).isEqualTo(payload)
   }
 
   @Test

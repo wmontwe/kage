@@ -5,7 +5,8 @@
  */
 package kage.format
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import java.io.ByteArrayOutputStream
 import kage.crypto.mlkem.MlKem768X25519Identity
 import kage.crypto.mlkem.MlKem768X25519Recipient

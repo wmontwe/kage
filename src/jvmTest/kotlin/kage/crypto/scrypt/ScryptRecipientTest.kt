@@ -5,7 +5,9 @@
  */
 package kage.crypto.scrypt
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
 import java.security.SecureRandom
 import kage.Age
 import org.junit.jupiter.api.Test
@@ -38,7 +40,7 @@ class ScryptRecipientTest {
 
     val unwrappedKey = identity.unwrap(listOf(stanza))
 
-    assertThat(fileKey).asList().containsExactlyElementsIn(unwrappedKey.asList())
+    assertThat(fileKey).isEqualTo(unwrappedKey)
   }
 
   @Test
@@ -53,7 +55,7 @@ class ScryptRecipientTest {
 
     val unwrappedKey = identity.unwrap(listOf(stanzas.first()))
 
-    assertThat(fileKey).asList().containsExactlyElementsIn(unwrappedKey.asList())
+    assertThat(fileKey).isEqualTo(unwrappedKey)
     assertThat(labels).isNotEmpty()
   }
 }

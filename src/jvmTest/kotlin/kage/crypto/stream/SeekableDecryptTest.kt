@@ -5,7 +5,8 @@
  */
 package kage.crypto.stream
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile

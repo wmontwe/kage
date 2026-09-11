@@ -5,7 +5,10 @@
  */
 package kage
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.startsWith
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import kage.crypto.stream.ArmorOutputStream
@@ -46,7 +49,7 @@ class DetachedHeaderTest {
     val header = Age.extractHeader(ByteArrayInputStream(ciphertext))
     val fileKey = Age.decryptHeader(header, listOf(identity))
 
-    assertThat(fileKey).hasLength(Age.FILE_KEY_SIZE)
+    assertThat(fileKey).hasSize(Age.FILE_KEY_SIZE)
 
     val decrypted = ByteArrayOutputStream()
     Age.decryptStream(
@@ -68,7 +71,7 @@ class DetachedHeaderTest {
 
     assertThat(fromArmor).isEqualTo(fromBinary)
     assertThat(fromArmor.decodeToString()).startsWith("age-encryption.org/v1\n")
-    assertThat(Age.decryptHeader(fromArmor, listOf(identity))).hasLength(Age.FILE_KEY_SIZE)
+    assertThat(Age.decryptHeader(fromArmor, listOf(identity))).hasSize(Age.FILE_KEY_SIZE)
   }
 
   @Test

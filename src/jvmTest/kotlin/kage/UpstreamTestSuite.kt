@@ -5,9 +5,10 @@
  */
 package kage
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.runCatching
-import com.google.common.truth.Truth.assertThat
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths

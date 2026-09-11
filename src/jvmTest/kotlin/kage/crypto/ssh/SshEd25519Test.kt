@@ -5,7 +5,10 @@
  */
 package kage.kage.crypto.ssh
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import java.io.ByteArrayInputStream
 import java.util.Random
 import kage.Age
@@ -52,7 +55,7 @@ class SshEd25519Test {
 
     val identity = SshKey.parseIdentity(privateKey)
     val unwrapped = identity.unwrap(listOf(stanza))
-    assertThat(unwrapped.asList()).containsExactlyElementsIn(fileKey.asList())
+    assertThat(unwrapped).isEqualTo(fileKey)
   }
 
   @Test
@@ -64,7 +67,7 @@ class SshEd25519Test {
     Random().nextBytes(fileKey)
 
     val stanzas = recipient.wrap(fileKey)
-    assertThat(identity.unwrap(stanzas).asList()).containsExactlyElementsIn(fileKey.asList())
+    assertThat(identity.unwrap(stanzas)).isEqualTo(fileKey)
   }
 
   @Test
@@ -110,7 +113,7 @@ class SshEd25519Test {
 
     val recipient = SshKey.parseRecipient(keyWithOptions)
 
-    assertThat(recipient).isInstanceOf(SshEd25519Recipient::class.java)
+    assertThat(recipient).isInstanceOf<SshEd25519Recipient>()
   }
 
   @Test

@@ -5,8 +5,12 @@
  */
 package kage.kage.crypto.mlkem
 
+import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.startsWith
 import com.github.michaelbull.result.getOrThrow
-import com.google.common.truth.Truth.assertThat
 import java.io.ByteArrayOutputStream
 import java.util.Random
 import kage.Age
@@ -53,13 +57,13 @@ class MlKem768X25519RecipientTest {
 
     assertThat(stanza.type).isEqualTo("mlkem768x25519")
     assertThat(stanza.args).hasSize(1)
-    assertThat(stanza.args.first().decodeBase64()).hasLength(1120)
-    assertThat(stanza.body).hasLength(Age.FILE_KEY_SIZE + 16)
+    assertThat(stanza.args.first().decodeBase64()).hasSize(1120)
+    assertThat(stanza.body).hasSize(Age.FILE_KEY_SIZE + 16)
     assertThat(labels).containsExactly("postquantum")
 
     val unwrapped = identity.unwrap(listOf(stanza))
 
-    assertThat(fileKey).asList().containsExactlyElementsIn(unwrapped.asList())
+    assertThat(fileKey).isEqualTo(unwrapped)
   }
 
   @Test

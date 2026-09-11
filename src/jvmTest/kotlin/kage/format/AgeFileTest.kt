@@ -5,7 +5,9 @@
  */
 package kage.kage.format
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.isEqualTo
 import java.io.ByteArrayInputStream
 import kage.crypto.scrypt.ScryptRecipient
 import kage.format.AgeFile
@@ -27,9 +29,7 @@ class AgeFileTest {
 
     assertThat(recipient.type).isEqualTo(ScryptRecipient.SCRYPT_STANZA_TYPE)
     assertThat(recipient.args).contains(ScryptRecipient.DEFAULT_WORK_FACTOR.toString())
-    assertThat(ageFile.body)
-      .asList()
-      .containsExactlyElementsIn(testFile.takeLast(ageFile.body.size))
+    assertThat(ageFile.body).isEqualTo(testFile.takeLast(ageFile.body.size).toByteArray())
   }
 
   // Mostly exists to appease the coverage gods but it's still a

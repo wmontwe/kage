@@ -36,7 +36,10 @@ kotlin {
   }
 
   sourceSets {
-    commonTest.dependencies { implementation(kotlin("test")) }
+    commonTest.dependencies {
+      implementation(kotlin("test"))
+      implementation(libs.assertk)
+    }
 
     jvmMain.dependencies {
       implementation(project.dependencies.platform(libs.junit.bom.get()))
@@ -50,17 +53,6 @@ kotlin {
       implementation(libs.junit.jupiter.api)
       runtimeOnly(libs.junit.jupiter.engine)
       runtimeOnly(libs.junit.platform.launcher)
-      implementation(
-        (project.dependencies.create(libs.truth.get()) as ExternalModuleDependency).apply {
-          exclude(group = "junit", module = "junit")
-        }
-      )
-      runtimeOnly(
-        project.dependencies.create(libs.junit.legacy.get()).apply {
-          // See https://github.com/google/truth/issues/333
-          because("Truth needs it")
-        }
-      )
     }
   }
 }

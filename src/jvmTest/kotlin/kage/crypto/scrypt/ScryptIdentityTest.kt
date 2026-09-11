@@ -5,7 +5,9 @@
  */
 package kage.kage.crypto.scrypt
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.isNotNull
 import kage.crypto.scrypt.ScryptIdentity
 import kage.crypto.scrypt.ScryptRecipient
 import kage.errors.ScryptIdentityException
@@ -28,7 +30,7 @@ class ScryptIdentityTest {
     val identity = ScryptIdentity("mypass".toByteArray())
 
     val exception = assertThrows<ScryptIdentityException> { identity.unwrap(listOf(stanza)) }
-    assertThat(exception.message).contains("failed to parse scrypt salt")
+    assertThat(exception.message).isNotNull().contains("failed to parse scrypt salt")
   }
 
   @Test

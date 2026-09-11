@@ -5,7 +5,12 @@
  */
 package kage.format
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import java.io.ByteArrayOutputStream
 import java.util.Base64
 import kage.errors.InvalidArbitraryStringException

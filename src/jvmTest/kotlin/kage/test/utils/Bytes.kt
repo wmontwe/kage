@@ -5,7 +5,11 @@
  */
 package kage.kage.test.utils
 
-import com.google.common.truth.Truth.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 
 /**

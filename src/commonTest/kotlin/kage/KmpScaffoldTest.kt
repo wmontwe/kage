@@ -5,12 +5,13 @@
  */
 package kage
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 
 class KmpScaffoldTest {
   @Test
   fun commonTestSourceSetRunsOnJvm() {
-    assertContentEquals(byteArrayOf(0x61, 0x67, 0x65), "age".encodeToByteArray())
+    assertThat("age".encodeToByteArray()).isEqualTo(byteArrayOf(0x61, 0x67, 0x65))
   }
 }
