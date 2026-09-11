@@ -4,19 +4,19 @@
  * or LICENSE-MIT files respectively.
  */
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinJvm
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.SourcesJar
+import info.solidsoft.gradle.pitest.PitestTask
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   alias(libs.plugins.animalsniffer)
   alias(libs.plugins.dokka)
-  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.kover)
   alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.pitest)
+  alias(libs.plugins.pitest) apply false
   alias(libs.plugins.spotless)
 }
 
@@ -27,11 +27,42 @@ version = requireNotNull(project.findProperty("VERSION_NAME"))
 kotlin {
   explicitApi()
   @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class) abiValidation()
-}
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+  jvm {
+    compilerOptions {
+      moduleName = "kage"
+      jvmTarget = JvmTarget.JVM_17
+    }
+  }
+
+  sourceSets {
+    commonTest.dependencies { implementation(kotlin("test")) }
+
+    jvmMain.dependencies {
+      implementation(project.dependencies.platform(libs.junit.bom.get()))
+      implementation(libs.bouncycastle.bcprov)
+      implementation(libs.hkdf)
+      implementation(libs.kotlinresult)
+    }
+
+    jvmTest.dependencies {
+      implementation(libs.junit.jupiter)
+      implementation(libs.junit.jupiter.api)
+      runtimeOnly(libs.junit.jupiter.engine)
+      runtimeOnly(libs.junit.platform.launcher)
+      implementation(
+        (project.dependencies.create(libs.truth.get()) as ExternalModuleDependency).apply {
+          exclude(group = "junit", module = "junit")
+        }
+      )
+      runtimeOnly(
+        project.dependencies.create(libs.junit.legacy.get()).apply {
+          // See https://github.com/google/truth/issues/333
+          because("Truth needs it")
+        }
+      )
+    }
+  }
 }
 
 mavenPublishing {
@@ -39,33 +70,55 @@ mavenPublishing {
   signAllPublications()
   @Suppress("UnstableApiUsage") pomFromGradleProperties()
   configure(
-    KotlinJvm(javadocJar = JavadocJar.Dokka("dokkaGenerate"), sourcesJar = SourcesJar.Sources())
+    KotlinMultiplatform(
+      javadocJar = JavadocJar.Dokka("dokkaGenerate"),
+      sourcesJar = SourcesJar.Sources(),
+    )
   )
 }
 
-pitest {
-  junit5PluginVersion.set("1.2.3")
-  pitestVersion.set("1.21.0")
-  avoidCallsTo.set(setOf("kotlin.jvm.internal"))
-  mutators.set(setOf("STRONGER"))
-  targetClasses.set(setOf("kage.*"))
-  targetTests.set(setOf("kage.*"))
-  threads.set(Runtime.getRuntime().availableProcessors())
-  outputFormats.set(setOf("XML", "HTML"))
-  // This is the current level we hit as of introducing pitest. It should never
-  // be allowed to regress.
-  mutationThreshold.set(73)
-  coverageThreshold.set(90)
-}
+// PIT is JVM-only, and its Gradle plugin requires the Java plugin that KMP rejects. Keep the plugin
+// on the build-script classpath without applying it, then wire its task type only to the JVM
+// target.
+val pitestJvmClasspath = configurations.create("pitestJvmClasspath")
 
-tasks.named("check") { dependsOn("pitest") }
+val pitestJvm =
+  tasks.register<PitestTask>("pitestJvm") {
+    group = "verification"
+    description = "Runs PIT mutation analysis against the KMP JVM target."
+    dependsOn("jvmTestClasses")
 
-tasks.withType<KotlinCompile>().configureEach {
-  compilerOptions {
-    moduleName = "kage"
-    jvmTarget = JvmTarget.JVM_17
+    launchClasspath.from(pitestJvmClasspath)
+    additionalClasspath.from(configurations.named("jvmTestRuntimeClasspath"))
+    additionalClasspath.from(layout.buildDirectory.dir("classes/kotlin/jvm/test"))
+    mutableCodePaths.from(layout.buildDirectory.dir("classes/kotlin/jvm/main"))
+    sourceDirs.from("src/jvmMain/kotlin")
+
+    testPlugin.set("junit5")
+    targetClasses.set(setOf("kage.*"))
+    targetTests.set(setOf("kage.*"))
+    avoidCallsTo.set(setOf("kotlin.jvm.internal"))
+    mutators.set(setOf("STRONGER"))
+    threads.set(Runtime.getRuntime().availableProcessors())
+    outputFormats.set(setOf("XML", "HTML"))
+    mutationThreshold.set(73)
+    coverageThreshold.set(90)
+    failWhenNoMutations.set(true)
+    timestampedReports.set(false)
+    useAdditionalClasspathFile.set(true)
+    additionalClasspathFile.set(layout.buildDirectory.file("tmp/pitestJvm-classpath.txt"))
+    reportDir.set(layout.buildDirectory.dir("reports/pitestJvm"))
+    historyInputLocation.set(layout.buildDirectory.file("reports/pitestJvm/history.bin"))
+    historyOutputLocation.set(layout.buildDirectory.file("reports/pitestJvm/history.bin"))
+    defaultFileForHistoryData.set(layout.buildDirectory.file("reports/pitestJvm/history.bin"))
+    jvmPath.set(file("${System.getProperty("java.home")}/bin/java"))
+    rootDir = projectDir
   }
-}
+
+tasks.named("check") { dependsOn(pitestJvm) }
+
+// AnimalSniffer protects the published JVM API. Test code intentionally uses newer JDK helpers.
+tasks.named("animalsnifferJvmTest") { enabled = false }
 
 spotless {
   val ktfmtVersion = "0.64"
@@ -82,24 +135,11 @@ spotless {
   }
 }
 
-sourceSets { named("main") { java.srcDirs("src/kotlin") } }
-
 dependencies {
   signature(variantOf(libs.animalsniffer.signature.android) { artifactType("signature") })
-  implementation(platform(libs.junit.bom))
-  implementation(libs.bouncycastle.bcprov)
-  implementation(libs.hkdf)
-  implementation(libs.kotlinresult)
-  pitest(libs.pitest.kotlin)
-  testImplementation(libs.junit.jupiter)
-  testImplementation(libs.junit.jupiter.api)
-  testRuntimeOnly(libs.junit.jupiter.engine)
-  testRuntimeOnly(libs.junit.platform.launcher)
-  testImplementation(libs.truth) { exclude(group = "junit", module = "junit") }
-  testRuntimeOnly(libs.junit.legacy) {
-    // See https://github.com/google/truth/issues/333
-    because("Truth needs it")
-  }
+  add(pitestJvmClasspath.name, libs.pitest.command.line)
+  add(pitestJvmClasspath.name, libs.pitest.junit5)
+  add(pitestJvmClasspath.name, libs.pitest.kotlin)
 }
 
 tasks.withType<Test>().configureEach {

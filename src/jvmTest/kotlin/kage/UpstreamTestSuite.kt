@@ -22,7 +22,7 @@ import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.fail
 
 class UpstreamTestSuite {
-  private val testFixtureRoot = Paths.get("src", "test", "resources", "CCTV", "age", "testdata")
+  private val testFixtureRoot = Paths.get("src", "jvmTest", "resources", "CCTV", "age", "testdata")
 
   @TestFactory
   fun generateTests(): List<DynamicTest> {
