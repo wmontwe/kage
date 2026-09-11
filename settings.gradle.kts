@@ -15,6 +15,7 @@ pluginManagement {
         listOf(
             "ru.vyarus.animalsniffer",
             "org.jetbrains.kotlin.jvm",
+            "org.jetbrains.kotlin.multiplatform",
             "com.diffplug.spotless",
             "info.solidsoft.pitest",
           )
